@@ -1,0 +1,9 @@
+---
+# Namespace for Spark Applications
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: spark-jobs
+  labels:
+    app: spark
+    purpose: big-data-analytics
