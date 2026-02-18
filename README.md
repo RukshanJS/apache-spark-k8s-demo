@@ -1,6 +1,8 @@
 # Apache Spark on Kubernetes Demo
 
-**University of Moratuwa — Big Data Analytics**
+**Guest Session by Rukshan J. Senanayaka**
+University of Moratuwa — Faculty of Information Technology
+Big Data Module | 18 February 2026, 1:15 pm – 3:15 pm
 
 Demonstrates deploying and running Apache Spark on Kubernetes using the Spark Operator, with a COVID-19 dataset as the workload.
 

@@ -45,7 +45,7 @@ top_cases = df.groupBy("Country") \
 ```
 
 **Q:** Why do we load via pandas first instead of Spark reading the CSV directly?
-> Spark can't fetch HTTPS URLs natively. The driver downloads it, then distributes the data.
+> Spark can read from HTTPS only with additional configuration and libraries. For this demo, it's simpler and more predictable to let the driver download the file with pandas, then distribute it to executors as a Spark DataFrame.
 
 ### 1b. The job definition — `kubernetes/spark-jobs/covid-analysis.yaml`
 
@@ -155,6 +155,8 @@ When `groupBy("Country").agg(max("Confirmed"))` runs, Spark first **partitions**
                                               final answer returned
 ```
 
+> Spark distributes **partitions**, not individual rows. Row counts per executor are approximate — Spark decides partition sizes based on data and configuration, not by splitting rows evenly.
+
 With 10 executors on 1 million rows, each handles ~100k rows simultaneously — the job finishes in roughly the same time as processing 100k rows on a single machine.
 
 ### What Spark handles automatically
@@ -225,7 +227,7 @@ Requests:
   memory:  512Mi
 ```
 
-These are the values from `covid-analysis.yaml`. The container physically cannot exceed them — K8s will throttle CPU and OOM-kill the pod if it tries. This is how multi-tenant clusters prevent one job from starving another.
+These are the values from `covid-analysis.yaml`. The container physically cannot exceed them — K8s will throttle CPU and OOM-kill the pod if it tries. This is how multi-tenant clusters prevent one job from starving another. Note that Spark itself is unaware of these limits — Kubernetes enforces them at the container level, underneath Spark.
 
 ### 4c. K8s tracks the application state
 
@@ -310,8 +312,8 @@ The Spark UI is only available while the driver pod is running. To catch it, sta
 ```
 
 What to look at:
-- **Jobs tab** — the 4 analysis queries
-- **Stages tab** — how each query was split into tasks across executors
+- **Jobs tab** — one job per Spark action (`show()`, `count()`) that was triggered; you'll see multiple jobs for the 4 analyses
+- **Stages tab** — how each job was split into tasks distributed across executors
 - **Executors tab** — CPU and memory usage per executor pod
 
 > The UI disappears as soon as the driver pod completes.

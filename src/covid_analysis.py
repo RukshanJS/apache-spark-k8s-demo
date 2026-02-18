@@ -16,7 +16,7 @@ Data Source: https://github.com/datasets/covid-19
 """
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import max as _max, desc
+from pyspark.sql.functions import max as _max, sum as _sum, desc
 import sys
 import pandas as pd
 
@@ -77,10 +77,16 @@ def analyze_global_statistics(df):
     print("Analysis 3: Global Statistics")
     print(f"{'='*60}\n")
 
-    global_stats = df.agg(
-        _max("Confirmed").alias("Global_Confirmed"),
-        _max("Deaths").alias("Global_Deaths"),
-        _max("Recovered").alias("Global_Recovered")
+    # Each country's peak cumulative value, then summed across all countries
+    country_peaks = df.groupBy("Country").agg(
+        _max("Confirmed").alias("Confirmed"),
+        _max("Deaths").alias("Deaths"),
+        _max("Recovered").alias("Recovered"),
+    )
+    global_stats = country_peaks.agg(
+        _sum("Confirmed").alias("Global_Confirmed"),
+        _sum("Deaths").alias("Global_Deaths"),
+        _sum("Recovered").alias("Global_Recovered"),
     )
 
     global_stats.show(truncate=False)
