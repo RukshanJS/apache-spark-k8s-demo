@@ -51,6 +51,9 @@ spark-debug/
 # Minikube
 .minikube/
 
+# Generated presentation output (PDF regenerated from presentation.md via marp)
+docs/presentation.pdf
+
 # Environment variables
 .env
 .env.*
