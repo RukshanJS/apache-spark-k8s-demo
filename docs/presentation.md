@@ -7,8 +7,8 @@ style: |
 
   section {
     font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
-    font-size: 26px;
-    padding: 48px 64px;
+    font-size: 21px;
+    padding: 34px 52px;
     color: #1a1a2e;
     background: #ffffff;
   }
@@ -55,8 +55,12 @@ style: |
 
   pre code {
     background: none;
-    color: inherit;
+    color: #ffffff;
     padding: 0;
+  }
+
+  pre code * {
+    color: inherit !important;
   }
 
   .pill {
@@ -109,12 +113,12 @@ style: |
     background: #1a1a2e;
     color: white;
     border-radius: 14px;
-    padding: 28px 36px;
+    padding: 18px 36px;
     text-align: center;
     font-size: 1.1em;
     font-weight: 700;
     letter-spacing: 0.5px;
-    margin: 16px auto;
+    margin: 10px auto;
     max-width: 680px;
   }
 
@@ -450,8 +454,6 @@ Questions that appear immediately:
 
 **Kubernetes (K8s)** is a container orchestrator — it manages containers at scale so you don't have to.
 
-<br>
-
 | You declare... | Kubernetes handles... |
 |---|---|
 | "I want 2 instances of this app" | Finding servers with free resources |
@@ -472,33 +474,40 @@ Questions that appear immediately:
 
 <div class="three-col">
 <div class="card">
-<strong>Pod</strong><br><br>
+<strong>Pod</strong><br>
 The smallest unit. One or more containers that run together. Gets its own IP address.
 </div>
 <div class="card">
-<strong>Namespace</strong><br><br>
+<strong>Namespace</strong><br>
 A logical partition. Like a folder for your resources. Isolates teams and workloads.
 </div>
 <div class="card">
-<strong>Node</strong><br><br>
+<strong>Node</strong><br>
 A machine (physical or VM) in the cluster. Pods run on nodes.
 </div>
 </div>
 
-<div class="three-col" style="margin-top:16px">
+<div class="three-col" style="margin-top:10px">
 <div class="card">
-<strong>Deployment</strong><br><br>
+<strong>Deployment</strong><br>
 Declares: "run N copies of this pod." Handles rolling updates.
 </div>
 <div class="card">
-<strong>Service</strong><br><br>
+<strong>Service</strong><br>
 A stable network address for a set of pods. Load balances between them.
 </div>
 <div class="card">
-<strong>CRD</strong><br><br>
+<strong>CRD</strong><br>
 Custom Resource Definition. Extend K8s with your own resource types — like <code>SparkApplication</code>.
 </div>
 </div>
+
+---
+
+<!-- _class: section-break -->
+
+# ⚡ Chapter 3
+## Apache Spark
 
 ---
 
@@ -507,8 +516,6 @@ Custom Resource Definition. Extend K8s with your own resource types — like <co
 In Kubernetes, **pods have no permissions by default**.
 
 Our Spark driver pod needs to create executor pods at runtime — that's a Kubernetes API call that will be rejected unless we explicitly allow it.
-
-<br>
 
 ```
 ServiceAccount "spark"  →  Role "spark-role"  →  RoleBinding
@@ -521,18 +528,9 @@ ServiceAccount "spark"  →  Role "spark-role"  →  RoleBinding
          driver pod runs AS this identity
 ```
 
-<br>
-
 <div class="card card-orange">
 Without RBAC: <code>403 Forbidden</code> the moment the driver tries to spawn executors.
 </div>
-
----
-
-<!-- _class: section-break -->
-
-# ⚡ Chapter 3
-## Apache Spark
 
 ---
 
@@ -626,8 +624,6 @@ As many as you configure. Run in parallel.
 
 # How data gets distributed
 
-<br>
-
 ```
 161,568 rows (COVID-19 dataset)
          │
@@ -641,8 +637,6 @@ As many as you configure. Run in parallel.
                                                 │
                                          final answer
 ```
-
-<br>
 
 <div class="card card-green">
 Spark distributes <strong>partitions</strong>, not individual rows. With 10 executors and 1M rows, each handles ~100k rows at the same time — the job finishes in roughly the time it takes to process 100k rows.
@@ -762,6 +756,8 @@ Your Mac (host)
 
 ---
 
+<!-- _style: "pre { font-size: 0.62em; }" -->
+
 # The SparkApplication CRD
 
 One YAML file declares the entire job:
@@ -837,8 +833,6 @@ Scale executors — and learn why more ≠ faster
 </div>
 </div>
 
-<br>
-
 <div class="card card-orange">
 📖 Follow along: <code>docs/HANDS-ON-LAB.md</code>
 </div>
@@ -888,8 +882,6 @@ kubectl delete pod <exec-pod-name> -n spark-jobs --grace-period=0 --force
 kubectl logs -f covid-analysis-driver -n spark-jobs
 ```
 
-<br>
-
 You'll see:
 ```
 ExecutorPodsAllocator: Going to request 1 executors from Kubernetes ...
@@ -906,15 +898,11 @@ KubernetesClusterSchedulerBackend: Registered executor ... with ID 3
 
 After scaling to 4 executors — does the job run 2× faster?
 
-<br>
-
 <div class="meme-box">
   <div class="meme-top">Me: changes instances from 2 to 4</div>
   <div class="meme-emoji">⏱️ → ⏱️</div>
   <div class="meme-bottom">The job: takes exactly the same time</div>
 </div>
-
-<br>
 
 **Why?** Amdahl's Law:
 
@@ -991,8 +979,6 @@ The dataset in this demo is intentionally small. The <strong>architecture</stron
 
 # The mental model
 
-<br>
-
 ```
 You write Python (what you want)
     │
@@ -1011,8 +997,6 @@ Docker containers run your code, isolated and reproducible
     ▼
 Result printed to your terminal
 ```
-
-<br>
 
 Every layer you met today is a real production tool used at scale — Spotify, Uber, LinkedIn, Netflix.
 
@@ -1056,7 +1040,7 @@ Every layer you met today is a real production tool used at scale — Spotify, U
 
 ---
 
-<!-- _class: section-break -->
+<!-- _class: title-slide -->
 <!-- _paginate: false -->
 
 # Thank you
